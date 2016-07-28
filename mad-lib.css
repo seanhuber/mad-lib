@@ -1,0 +1,14 @@
+.madlib > span.field-wrapper > input[type='text'] {
+  display: inline-block;
+  width: auto;
+  height: 23px;
+}
+
+.madlib > span.field-wrapper > input[type='text'].madlib-other {
+  display: none;
+  margin-left: 5px;
+}
+
+.madlib > span.field-wrapper > .btn-group > button {
+  padding: 0px 10px;
+}

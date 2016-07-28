@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta http-equiv='Cache-Control' content='no-cache, no-store, must-revalidate' />
+    <meta http-equiv='Pragma' content='no-cache' />
+    <meta http-equiv='Expires' content='0' />
+    <meta charset='UTF-8' />
+    <meta name='google' content='notranslate'>
+    <meta http-equiv='Content-Language' content='en' />
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <title>mad-lib</title>
+
+    <script src='https://code.jquery.com/jquery-2.2.4.min.js' integrity='sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=' crossorigin='anonymous'></script>
+
+    <script src='https://code.jquery.com/ui/1.12.0-rc.2/jquery-ui.min.js' integrity='sha256-55Jz3pBCF8z9jBO1qQ7cIf0L+neuPTD1u7Ytzrp2dqo='   crossorigin='anonymous'></script>
+
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css' integrity='sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7' crossorigin='anonymous'>
+
+    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js' integrity='sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS' crossorigin='anonymous'></script>
+
+    <script src='https://cdn.rawgit.com/davidstutz/bootstrap-multiselect/v0.9.13/dist/js/bootstrap-multiselect.js' crossorigin='anonymous'></script>
+    <link href='https://cdn.rawgit.com/davidstutz/bootstrap-multiselect/v0.9.13/dist/css/bootstrap-multiselect.css' rel='stylesheet' type='text/css'>
+
+    <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
+
+    <script src='../mad-lib.js' type='text/javascript' charset='utf-8'></script>
+    <link rel='stylesheet' href='../mad-lib.css' type='text/css' media='screen' />
+
+    <style>
+      body {
+        font-family: 'Lato', sans-serif !important;
+        text-align: center;
+      }
+
+      #demo, #output {
+        text-align: left;
+        margin: 0px 100px 0px;
+        min-width: 500px;
+        border: 2px dashed lightgray;
+        padding: 20px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Input:</h3>
+    <div id='demo'></div>
+    <h3>Output:</h3>
+    <div id='output'></div>
+
+    <script>
+      $('#demo').madlib({
+        template: "Two #{field_1}, both alike in dignity, In fair #{field_2}, where we lay our scene, From ancient #{field_3} break to new mutiny, Where civil blood makes civil hands unclean. From forth the fatal loins of these two foes A pair of star-cross'd #{field_4} take their life; Whose misadventured piteous overthrows Do with their #{field_5} bury their parents' strife. The fearful passage of their #{field_6} love, And the continuance of their parents' rage, Which, but their children's end, nought could #{field_7}, Is now the #{field_8} hours' traffic of our stage; The which if you with #{field_9} #{field_10} attend, What here shall #{field_11}, our toil shall strive to mend.",
+        fields: {
+          field_1: {type: 'text_field', preset: 'households'},
+          field_2: {type: 'multi_select', preset: 'madlib_other', preset_other: 'Verona', values: ['Rome', 'Chicago', 'New York'], include_other: true},
+          field_3: {type: 'text_field', preset: 'grudge'},
+          field_4: {type: 'radio_select', preset: 'lovers', values: ['lovers', 'kittens', 'buddies', 'superheros']},
+          field_5: {type: 'text_field', preset: 'death'},
+          field_6: {type: 'text_field', preset: 'death-mark\'d'},
+          field_7: {type: 'text_field', preset: 'remove'},
+          field_8: {type: 'radio_select', preset: 'two', values: ['two', 'three', 'four', 'five']},
+          field_9: {type: 'text_field', preset: 'patient'},
+          field_10: {type: 'text_field', preset: 'ears'},
+          field_11: {type: 'text_field', preset: 'miss'}
+        },
+        change: function( event, data ) {
+          console.log('Change event listener (as an option) invoked.');
+          $('#output').text( $('#demo').madlib('getMadLib') );
+        }
+      });
+
+      $('#demo').on('madlibchange', function() {
+        console.log('Change event listener (NOT as an option) invoked.');
+      });
+
+      $('#output').text( $('#demo').madlib('getMadLib') );
+    </script>
+  </body>
+</html>
