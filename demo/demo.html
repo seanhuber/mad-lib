@@ -76,9 +76,11 @@
 
       $('#demo').on('madlibchange', function() {
         console.log('Change event listener (NOT as an option) invoked.');
+        console.log( $('#demo').madlib('getFieldValues') );
       });
 
       $('#output').text( $('#demo').madlib('getMadLib') );
+
     </script>
   </body>
 </html>

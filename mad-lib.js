@@ -86,32 +86,47 @@
       $.each(that.options.fields, function(k,v){that._addField(k,v)});
     },
 
-    _fieldVal: function( field ) {
-      var field_opts = this.options.fields[field];
-      var ret_v = null;
-      switch( field_opts.type ) {
-        case 'radio_select':
-        case 'multi_select':
-          var values = this.element.find("select[name='"+field+"'] > option:selected").map(function(){return this.value;}).get();
-          var other_idx = values.indexOf('madlib_other');
-          if (field_opts.hasOwnProperty('include_other') && field_opts.include_other && other_idx >= 0)
-            values[other_idx] = this.element.find("input[name='madlib_other_"+field+"']").val();
-          ret_v = values.length > 0 ? this._phrasify(values) : '';
-          break;
-        case 'text_field':
-          ret_v = this.element.find("input[name='"+field+"']").val();
-          break;
-        default:
-          throw 'Unrecognized madlib field type: ' + field_opts.type;
-      }
-      return ret_v;
+    getFieldValues: function() {
+      var that = this;
+      var ret_h = {};
+      $.each(that.options.fields, function(field, field_opts) {
+        switch( field_opts.type ) {
+          case 'radio_select':
+          case 'multi_select':
+            ret_h[field] = that.element.find("select[name='"+field+"'] > option:selected").map(function(){return this.value;}).get();
+            if (field_opts.hasOwnProperty('include_other') && field_opts.include_other && ret_h[field].indexOf('madlib_other') >= 0) {
+              ret_h[field+'_madlib_other'] = that.element.find("input[name='madlib_other_"+field+"']").val();
+              ret_h[field].splice(-1,1); // removes the last element of the array (which is 'madlib_other')
+            }
+            if (field_opts.type == 'radio_select') {
+              ret_h[field] = ret_h[field].length > 0 ? ret_h[field][0] : ''
+            }
+            break;
+          case 'text_field':
+            ret_h[field] = that.element.find("input[name='"+field+"']").val();
+            break;
+          default:
+            throw 'Unrecognized madlib field type: ' + field_opts.type;
+        }
+      });
+      return ret_h;
     },
 
     getMadLib: function() {
       var that = this;
       var sentence = that.options.template;
+      var field_vals = that.getFieldValues();
       $.each(that.options.fields, function(field, field_opts) {
-        sentence = sentence.replace('#{'+field+'}', that._fieldVal(field));
+        if (field_vals.hasOwnProperty(field) && typeof(field_vals[field]) !== 'undefined' ) {
+          var field_val = field_vals[field];
+          if ($.type(field_val) !== 'array') {
+            field_val = $.trim(field_val) == '' ? [] : [$.trim(field_val)];
+          }
+          if (field_vals.hasOwnProperty(field+'_madlib_other') && $.trim(field_vals[field+'_madlib_other']) != '')
+            field_val.push($.trim(field_vals[field+'_madlib_other']));
+          if (field_val.length > 0 )
+            sentence = sentence.replace('#{'+field+'}', that._phrasify(field_val));
+        }
       });
       return sentence;
     },
