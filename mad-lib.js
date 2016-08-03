@@ -36,7 +36,9 @@
       if (include_other) {
         var $other = $("<input name='madlib_other_"+field+"' type='text' class='madlib-other form-control' placeholder='Other'>");
         $other.change(function() {that._trigger('change', null, {});});
-        $other.appendTo($wrapper);
+        var $other_wrapper = $("<span class='other-field-wrapper'></span>");
+        $wrapper.after($other_wrapper);
+        $other.appendTo($other_wrapper);
       }
 
       var multi_opts = {

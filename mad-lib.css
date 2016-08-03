@@ -1,10 +1,11 @@
-.madlib > span.field-wrapper > input[type='text'] {
+.madlib > span.field-wrapper > input[type='text'],
+.madlib > span.other-field-wrapper > input.madlib-other[type='text'] {
   display: inline-block;
   width: auto;
   height: 23px;
 }
 
-.madlib > span.field-wrapper > input[type='text'].madlib-other {
+.madlib > span.other-field-wrapper > input.madlib-other[type='text'] {
   display: none;
   margin-left: 5px;
 }
