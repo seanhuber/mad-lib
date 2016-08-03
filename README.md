@@ -139,12 +139,34 @@ $('#example').on('madlibchange', function() {
 });
 ```
 
-Also the widget has a public function that will return the completed mad-lib as a string:
+Methods
+----------------------------------
+
+##### getMadLib
+
+Returns the generated MadLib as a string.
 
 ```javascript
-alert("You're madlib: " + $('#example').madlib('getMadLib'));
+$('#example').madlib('getMadLib');
+
+=> "Text field: Example. Single select dropdown: Prepopulated text. Multiselect dropdown: two, four, and forty"
 ```
 
+##### getFieldValues
+
+Returns a javscript object whose keys are field identifiers (or field_id+'_madlib_other') and whose values are either a string or an array (depending on field type).
+
+```javascript
+$('#example').madlib('getFieldValues');
+
+=> {
+  my_text_field: 'Example',
+  a_radio_select: '',
+  a_radio_select_madlib_other: 'Prepopulated text',
+  multi_select_field: ['two', 'four'],
+  multi_select_field_madlib_other: 'forty'
+}
+```
 
 License
 ----------------------------------
