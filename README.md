@@ -121,7 +121,7 @@ Usage
         preset: ['two', 'four', 'madlib_other', 'Weird number: #{weird_num}'],
         preset_other: 'forty',
         preset_subfields: {
-          wird_num: '3.14159'
+          weird_num: '3.14159'
         }
       }
     },
