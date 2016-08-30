@@ -111,14 +111,18 @@ Usage
        * - include_other (optional, boolean), set to true to add an "Other" option that when selected, will add a text field for custom entry
        * - preset (optional, string or array of strings), preselects one or more values from the dropdown. To preselect "Other", set it to "madlib_other"
        * - preset_other (optional, string), prepopulates the "Other" text field that is displayed when a user selects "Other" from the dropdown
+       * - preset_subfields (optional, Object), prepopulates subfields that appear when #{subfield_id} text exists in one or more of the dropdown values
        */
       multi_select_field: {
         type: 'multi_select',
-        values: ['one', 'two', 'three', 'four', 'five'],
+        values: ['one', 'two', 'three', 'four', 'five', 'Weird number: #{weird_num}'],
         prompt: 'Pick number(s)',
         include_other: true,
-        preset: ['two', 'four', 'madlib_other'],
-        preset_other: 'forty'
+        preset: ['two', 'four', 'madlib_other', 'Weird number: #{weird_num}'],
+        preset_other: 'forty',
+        preset_subfields: {
+          wird_num: '3.14159'
+        }
       }
     },
     /*

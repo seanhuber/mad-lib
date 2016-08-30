@@ -27,9 +27,30 @@
       var that = this;
       var $field = $("<select name='"+field+"' size='2'></select>");
       if (is_multiple) $field.prop('multiple', 'multiple');
+
+      var subfields = [];
       $.each(field_opts.values, function(idx, val) {
-        $("<option value='"+val+"'>"+val+'</option>').appendTo($field);
+        var data_subfield_str = '';
+        var opt_val = val;
+
+        if (val.indexOf('#{') >= 0) {
+          var subfield = val.substring(val.indexOf('#{')+2, val.indexOf('}'));
+          data_subfield_str = "data-subfield='"+subfield+"'";
+          subfields.unshift(subfield);
+          opt_val = val.replace('#{'+subfield+'}', '...');
+        }
+
+        $('<option '+data_subfield_str+" value='"+val+"'>"+opt_val+'</option>').appendTo($field);
       });
+
+      $.each(subfields, function(idx, subfield) {
+        var $subfield = $("<input name='madlib_subfield_"+subfield+"' type='text' class='madlib-subfield form-control' placeholder='"+subfield+"'>");
+        $subfield.change(function() {that._trigger('change', null, {});});
+        var $subfield_wrapper = $("<span class='subfield-field-wrapper'></span>");
+        $wrapper.after($subfield_wrapper);
+        $subfield.appendTo($subfield_wrapper);
+      });
+
       var include_other = field_opts.hasOwnProperty('include_other') && field_opts.include_other;
       if (include_other) $("<option value='madlib_other'>Other</option>").appendTo($field);
       $field.appendTo($wrapper);
@@ -43,6 +64,12 @@
 
       var multi_opts = {
         onChange: function(option, checked, select) {
+          $.each(subfields, function(idx, subfield) {
+            var show_subfield = that.element.find("select[name='"+field+"'] > option[data-subfield='"+subfield+"']").is(':selected');
+            var $subfield = that.element.find("input[name='madlib_subfield_"+subfield+"']");
+            $subfield.toggle(show_subfield);
+          });
+
           if (include_other) {
             var show_other = that.element.find("select[name='"+field+"'] > option[value='madlib_other']:selected").length > 0;
             var $other = that.element.find("input[name='madlib_other_"+field+"']");
@@ -55,6 +82,11 @@
       if (field_opts.hasOwnProperty('prompt')) multi_opts.nonSelectedText = field_opts.prompt;
       $field.multiselect(multi_opts);
 
+      if (field_opts.hasOwnProperty('preset_subfields')) {
+        $.each(field_opts.preset_subfields, function(subfield, val) {
+          that.element.find("input[name='madlib_subfield_"+subfield+"']").val(val);
+        });
+      }
       if (field_opts.hasOwnProperty('preset_other')) that.element.find("input[name='madlib_other_"+field+"']").val(field_opts.preset_other);
       if (field_opts.hasOwnProperty('preset')) $field.multiselect('select', field_opts.preset, true);
     },
@@ -95,7 +127,15 @@
         switch( field_opts.type ) {
           case 'radio_select':
           case 'multi_select':
-            ret_h[field] = that.element.find("select[name='"+field+"'] > option:selected").map(function(){return this.value;}).get();
+            ret_h[field] = that.element.find("select[name='"+field+"'] > option:selected").map(function(){
+              var subfield = $(this).data('subfield');
+              if (subfield != null) {
+                if (!ret_h.hasOwnProperty(field+'_madlib_subfields')) ret_h[field+'_madlib_subfields'] = {};
+                ret_h[field+'_madlib_subfields'][subfield] = that.element.find("input[name='madlib_subfield_"+subfield+"']").val();
+              }
+
+              return this.value;
+            }).get();
             if (field_opts.hasOwnProperty('include_other') && field_opts.include_other && ret_h[field].indexOf('madlib_other') >= 0) {
               ret_h[field+'_madlib_other'] = that.element.find("input[name='madlib_other_"+field+"']").val();
               ret_h[field].splice(-1,1); // removes the last element of the array (which is 'madlib_other')
@@ -126,8 +166,18 @@
           }
           if (field_vals.hasOwnProperty(field+'_madlib_other') && $.trim(field_vals[field+'_madlib_other']) != '')
             field_val.push($.trim(field_vals[field+'_madlib_other']));
-          if (field_val.length > 0 )
-            sentence = sentence.replace('#{'+field+'}', that._phrasify(field_val));
+          if (field_val.length > 0 ) {
+            var vals_with_subfields_replaced = $.map(field_val, function(val){
+              var ret_str = val;
+              if (val.indexOf('#{') >= 0) {
+                var subfield = val.substring(val.indexOf('#{')+2, val.indexOf('}'));
+                var subfield_val = that.element.find("input[name='madlib_subfield_"+subfield+"']").val();
+                ret_str = ret_str.replace('#{'+subfield+'}', subfield_val);
+              }
+              return ret_str;
+            });
+            sentence = sentence.replace('#{'+field+'}', that._phrasify(vals_with_subfields_replaced));
+          }
         }
       });
       return sentence;

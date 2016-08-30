@@ -175,3 +175,22 @@ QUnit.test('using other with multi_select field', function( assert ) {
 
   clearMadLib('multi_other');
 });
+
+QUnit.test('using subfield with multi_select field', function( assert ) {
+  expect(1);
+  addMadLib('multi_subfield', '---#{asdfasdf}---', {
+    asdfasdf: {
+      type: 'multi_select',
+      values: ['one', 'two', 'three', 'four', 'my subfield is @@#{special_subfield}@@']
+    }
+  });
+
+  var $dropdown = $("#multi_subfield select[name='asdfasdf']");
+  $dropdown.multiselect('select', ['one', 'four', 'my subfield is @@#{special_subfield}@@'], true);
+  var $subfield = $("#multi_subfield input[name='madlib_subfield_special_subfield']");
+  $subfield.val('SPECIAL VALUES!!!');
+  $subfield.trigger('change');
+  assertMadlib(assert, 'multi_subfield', '---one, four, and my subfield is @@SPECIAL VALUES!!!@@---', 'subfield text entered');
+
+  clearMadLib('multi_subfield');
+});
